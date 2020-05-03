@@ -1,0 +1,1395 @@
+
+<!-- saved from url=(0064)https://www.ime.usp.br/~cris/mac121/eps/ep4/enunciado/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+  <title>MAC0121 Algoritmos e Estruturas de Dados I</title>
+  <link rel="stylesheet" href="./enunciado_files/eps.css" type="text/css">
+</head>
+<body cz-shortcut-listen="true">
+
+
+<p align="right">
+<small><b><a href="http://www.ime.usp.br/mac/">Departamento de Ciência da Computação</a> - <a href="http://www.ime.usp.br/">IME</a> - <a href="http://www.usp.br/">USP</a></b></small><br>
+
+</p>
+<h1>MAC0121 Algoritmos e Estruturas de Dados I</h1>
+
+<h2>Segundo Semestre de 2019</h2>
+
+<h3 class="center">Quarto Exercício Programa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</h3>
+
+<p>&nbsp;</p>
+<h2 class="titulo">Pitão II</h2>
+
+<p>&nbsp;</p>
+<hr>
+<h2>
+Objetivos
+</h2>
+
+O objetivo desse quarto exercício-programa é treinar mais ainda a 
+<ol>
+<li>utilização de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/stru.html">registros e structs</a>,
+</li><li>utilização de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/aloca.html">alocação dinâmica de memória</a>,
+</li><li>manipulação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/lista.html">listas encadeadas</a>,
+</li><li>manipulação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/pilha.html">pilhas</a> e
+</li><li>manipulação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/fila.html">filas</a>,
+</li><li>aplicação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/pilha.html#infixa">notação posfixa (polonesa reversa)</a> para o cálculo de expressões e, em geral,   compreensão da semântica de expressões em
+linguagens de programação como por exemplo Python e C.
+</li><li>familiarização com o conceito de tabelas de símbolos.
+</li></ol>
+De quebra todos utilizarão mais interfaces e verão um pouco mais do processo envolvido na interpretação/compilação de expressões.
+<p></p>
+<p>
+Depois de fazer o EP3 e EP4 é esperado que todos passem
+a compreender melhor o significado (semântica) de expressões em C como:
+</p><pre><!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #AA22FF; font-weight: bold">if</span> ((x <span style="color: #666666">=</span> stackPop()) <span style="color: #666666">!=</span> <span style="color: #BB4444">'#'</span>) ...
+
+    a <span style="color: #666666">=</span> b <span style="color: #666666">=</span> c <span style="color: #666666">=</span> <span style="color: #666666">5</span>;
+
+    <span style="color: #AA22FF; font-weight: bold">if</span> (a <span style="color: #666666">&lt;</span> b <span style="color: #666666">&lt;</span> c) . . .
+
+    <span style="color: #AA22FF; font-weight: bold">while</span> (<span style="color: #666666">!</span>achou) ...
+</pre></div></pre>
+Em particular, a semântica de expressões como
+<pre><!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">     a <span style="color: #666666">&lt;</span> b <span style="color: #666666">&lt;</span> c <span style="color: #666666">&lt;</span> d
+</pre></div></pre>
+é diferente em Python e em C. Além disso, expressões como
+<pre><!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">     a <span style="color: #666666">=</span> (b <span style="color: #666666">=</span> <span style="color: #666666">2</span> <span style="color: #666666">*</span> (c <span style="color: #666666">=</span> <span style="color: #666666">2</span>))
+</pre></div></pre>
+que não são aceitas pelo Python, são muito utilizadas em C.
+Nessas, e em outras situações, a semântica adotada neste EP é a da linguagem C, apesar
+da sintaxe (e semântica) utilizada para cada operador ser a do Python.
+<p></p>
+<p>
+Este EP é uma adaptação feita pelo Professor José Coelho de Pina do 
+<a href="http://www.ime.usp.br/~hitoshi/mac0122-2012/ep4/">EP4 de MAC0122 em 2012</a> 
+de autoria do professor Carlos Hitoshi Morimoto
+</p> 
+
+<p>&nbsp;</p>
+<hr>
+<h2>
+Introdução
+</h2>
+
+<p> Neste EP você implementará um interpretador de expressões em notação
+infixa  que, como  em um  programa,  também pode  conter variáveis.   De
+maneira  semelhante  ao  EP3,  você  escreverá  um  programa  que  <font color="red">lê</font> de um arquivo  ou de um <i>prompt</i> uma sequência
+de expressões  e <font color="red">calcula e  imprime</font> o resultado
+de cada uma.   A diferença  agora é que  as expressões são  mais semelhantes
+àquelas  encontradas em  linguagens de  programação como  <tt>C</tt>. As
+expressões serão em notação infixa  e poderão conter variáveis.  Como em
+um programa,  variáveis poderão ser inicializadas por meio  de atribuições e
+reutilizadas em expressões futuras.  </p>
+
+<p>
+Cada expressão pode conter <b><font color="red">variáveis</font></b>, 
+números,  <b><font color="red">abre e fecha parênteses</font></b>
+e os seguintes símbolos correspondentes a um <b><font color="red">operador de atribuição</font></b>,
+6 operadores relacionais, 8 operadores aritméticos e 3 operadores lógicos: 
+</p><center>
+<table border="1">
+  <colgroup><col align="left">
+  <col align="center">
+</colgroup><tbody><tr>
+<th>operação</th>
+<th>símbolo</th>
+</tr>
+
+<tr>
+<td><font color="red"><b>atribuição</b></font></td>
+<td align="center"><font color="red"><tt>= </tt></font></td>
+</tr>
+
+<tr>
+<td>igual</td>
+<td align="center"><tt>==</tt></td>
+</tr>
+
+
+<tr>
+<td>diferente</td>
+<td align="center"><tt>!=</tt></td>
+</tr>
+
+
+<tr>
+<td>maior ou igual</td>
+<td align="center"><tt>&gt;=</tt></td>
+</tr>
+
+
+<tr>
+<td>menor ou igual</td>
+<td align="center">&lt;=</td>
+</tr>
+
+
+<tr>
+<td>maior</td>
+<td align="center"> <tt>&gt;</tt></td>
+</tr>
+
+
+<tr>
+<td>menor</td>
+<td align="center"> <tt>&lt;</tt></td>
+</tr>
+
+<tr>
+<td>exponenciação</td>
+<td align="center"> <tt>**</tt></td>
+</tr>
+
+
+<tr>
+<td>resto de divisão</td>
+<td align="center"> <tt>%</tt></td>
+</tr>
+
+
+<tr>
+<td>multiplicação</td>
+<td align="center"> <tt>*</tt></td>
+</tr>
+
+
+<tr>
+<td>divisão</td>
+<td align="center"> <tt>/</tt></td>
+</tr>
+
+<tr>
+<td>divisão inteira</td>
+<td align="center"> <tt>//</tt></td>
+</tr>
+
+<tr>
+<td>adição</td>
+<td align="center"> <tt>+</tt></td>
+</tr>
+
+
+<tr>
+<td>subtração</td>
+<td align="center"> <tt>-</tt></td>
+</tr>
+
+<tr>
+<td>menos unário</td>
+<td align="center"> <tt>_</tt></td>
+</tr>
+
+<tr>
+<td>e lógico</td>
+<td align="center"><tt>and</tt></td>
+</tr>
+
+<tr>
+<td>ou lógico</td>
+<td align="center"><tt>or</tt></td>
+</tr>
+
+<tr>
+<td>negação</td>
+<td align="center"> <tt>not</tt></td>
+</tr>
+
+</tbody></table>
+</center>
+<p></p> 
+
+
+
+<!------------------------------------------------------------------------------>
+<p>&nbsp;</p>
+<hr>
+<h2>
+Comportamento do programa
+</h2>
+
+<p>
+Como no EP3 o programa <tt>pitao</tt> poderá ser executado no 
+<font color="green"><i>modo interativo</i></font> (opção <font color="green"><tt>"-i"</tt></font>)
+ou no <font color="magenta"><i>modo script</i></font> (opção <font color="magenta"><tt>"-s"</tt></font>). </p><p>
+O novo <tt>pitao</tt> deve ler uma sequência de linhas (<i>strings</i>),
+independentemente do modo selecionado.
+</p>
+
+<p>
+O programa <tt>pitao</tt>, quando invocado com a opção "<tt>-h</tt>" (<i><font color="red">h</font>elp</i>) 
+mostra como deve ser utilizado. Nos exemplos a seguir de execução do programa,
+texto em <font color="red"><b>vermelho</b></font> indica algo digitado pelo usuário.
+</p><pre class="code">prompt&gt; <font color="red">./pitao -h</font>
+./pitao: Uso 
+prompt&gt; ./pitao [-h] [-i | -s<nome-script> ] [-l] [-v] [-p] [-e] [-t]
+    -h = mostra como usar o programa e abandona o programa
+    -i = executa em modo (i)nterativo
+    -s&lt;nome-script&gt; = calcula as expressões no arquivo &lt;nome-script&gt;
+    -l = mostra fila de itens (l)exicos
+    -v = mostra fila de (v)alores
+    -p = mostra a (p)ilha de execucao apos cada operacao
+    <font color="green"><b>-e = mostra a (e)xpressao na notacao posfixa (EP4)</b></font>
+    <font color="green"><b>-t = mostra a (t)abela de simbolos (EP4)</b></font>
+</nome-script></pre>
+Note que o EP4 tem duas opções novas em relação ao EP3,
+as opções <font color="green"><tt>"-e"</tt></font> e <font color="green"><tt>"-t"</tt></font>
+que são descritas mais adiante.
+<p></p>
+
+
+<h3>
+Expressões infixas
+</h3>
+
+O novo <tt>pitao</tt> recebe linhas contendo expressões em notação infixa 
+e calcula e imprime o valor de cada expressão.
+<pre class="code">prompt&gt; <font color="red">./pitao -i</font>
+MAC0121 2019 - EP4
+Pitao (Oct 25 2019, 12:09:28)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">2 **8 # 2 elevado a 8</font> 
+256
+&gt;&gt;&gt; <font color="red">2 **_ 1 # 2 elevado a -1</font>
+0.5
+&gt;&gt;&gt; <font color="red">2 + 3 *4</font>              
+14
+&gt;&gt;&gt; <font color="red">2 ** 2 ** 3 # o mesmo que 2 elevado a (2 elevado a 3)</font>              
+256
+</pre>
+Como agora as expressões estão na notação infixa, para alterar a ordem em 
+que as operações são executadas devemos utilizar um par de abre e fecha parênteses.
+<pre class="code">&gt;&gt;&gt; <font color="red">(2 + 3) * 4</font>      
+20
+&gt;&gt;&gt; <font color="red">(2 + 2) * 4 ** 0.5 # 4 elevado a 0.5 e 2</font>
+8
+&gt;&gt;&gt; <font color="red">((2 + 2) * 4) ** 0.5 # raiz quadrada de 8</font>
+4
+&gt;&gt;&gt; <font color="red">(2 ** 2) ** 3 # o mesmo que 4 elevado a 3</font>
+64
+</pre>
+Além disso, as expressões podem envolver variáveis que podem armazenar valores que podem ser reutilizados.
+Como em Python, para criar uma variável utilizamos o operador <tt>"="</tt> de atribuição.
+<pre class="code">&gt;&gt;&gt; <font color="red">a = 5</font>
+5
+&gt;&gt;&gt; <font color="red">a # o valor da expressao com uma variavel e o seu conteudo</font>
+5
+&gt;&gt;&gt; <font color="red">b = a + 1</font>
+6
+&gt;&gt;&gt; <font color="red">c = a + b</font>
+11
+&gt;&gt;&gt; <font color="red">c</font>
+11
+&gt;&gt;&gt; <font color="red">prova1 = 6</font>
+6
+&gt;&gt;&gt; <font color="red">prova2 = 7</font>
+7
+&gt;&gt;&gt; <font color="red">media = (prova1 + 2*prova2)/3</font>        
+6.66667
+&gt;&gt;&gt; <font color="red">media</font>
+6.66667
+</pre>
+As expressões podem ainda conter operadores relacionais, aritméticos, lógicos e atribuições múltiplas, como em C.
+<pre class="code">&gt;&gt;&gt; <font color="red">ep1 = 5</font>
+5
+&gt;&gt;&gt; <font color="red">ep2 = 2.5</font>
+2.5
+&gt;&gt;&gt; <font color="red">ep3 = 6</font>
+6
+&gt;&gt;&gt; <font color="red">mep = (ep1 + 2*ep2 + 3*ep3)/6</font>
+4.66667
+&gt;&gt;&gt; <font color="red">p1 = 5</font>      
+5
+&gt;&gt;&gt; <font color="red">p2 = 6</font>
+6
+&gt;&gt;&gt; <font color="red">mp = (p1 + 2* p2)/3</font>
+5.66667
+&gt;&gt;&gt; <font color="red">aprovado = mp &gt;= 5 and mep &gt;= 5</font>
+0
+&gt;&gt;&gt; <font color="red">i = j = k = 0</font>
+0
+&gt;&gt;&gt; <font color="red">i</font>
+0
+&gt;&gt;&gt; <font color="red">j</font>
+0
+&gt;&gt;&gt; <font color="red">k</font>
+0
+</pre>
+ 
+
+<h3>
+Expressão posfixa
+</h3>
+
+<p>
+O programa transforma cada expressão em notação infixa lida em uma expressão 
+em notação posfixa equivalente.
+O programa <tt>pitao</tt> pode imprimir essa expressão em notação posfixa, para isto basta ser executado com a opção "<font color="green"><tt>-e</tt></font>".
+</p>
+<pre class="code">prompt&gt; <font color="red">./pitao <font color="green">-e</font></font>
+MAC0121 2019 - EP4
+Pitao (Oct 25 2019, 12:09:28)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">a = 1</font>
+Expressao posfixa:  a 1 =
+1
+&gt;&gt;&gt; <font color="red">b = 2</font>
+Expressao posfixa:  b 2 =
+2
+&gt;&gt;&gt; <font color="red">c = (a + 1) * b ** 0.5</font>
+Expressao posfixa:  c a 1 + b 0.5 ** * =
+2.82843
+&gt;&gt;&gt; <font color="red">a = (b = c - 0.828443) * 2 + a</font> 
+Expressao posfixa:  a b c 0.828443 - = 2 * a + =
+4.99997
+&gt;&gt;&gt; <font color="red">a = 1</font>
+Expressao posfixa:  a 1 =
+1
+&gt;&gt;&gt; <font color="red">b = 2</font>
+Expressao posfixa:  b 2 =
+2
+&gt;&gt;&gt; <font color="red">b = b + a</font> 
+Expressao posfixa:  b b a + =
+3
+&gt;&gt;&gt; <font color="red">bool = b &lt; 3</font>
+Expressao posfixa:  bool b 3 &lt; =
+0
+&gt;&gt;&gt; <font color="red">bool</font>
+Expressao posfixa:  bool
+0
+</pre>
+
+<h3>
+Tabela de símbolos
+</h3>
+<p>
+Uma <a href="http://www.ime.usp.br/~pf/mac0122-2002/aulas/symbol-table.html"><font color="red"><i>tabela de símbolos</i></font></a>
+ (<a href="http://en.wikipedia.org/wiki/Symbol_table"><font color="red"><i>symbol table</i></font></a>)  é uma estrutura
+de dados utilizada por interpretadores e compiladores para manter
+informações sobre cada identificador tais como o seu tipo, a posição em
+que está armazenado e outras informações relevantes.
+</p>
+
+<p> Em geral,
+uma <a href="http://www.ime.usp.br/~pf/mac0122-2002/aulas/symbol-table.html">tabela
+de símbolos</a> é uma estrutura de dados que
+representa <font color="red"><i>objetos</i></font>
+ou <font color="red"><i>itens</i></font>, cada um dotado de
+uma <font color="red"><i>chave</i></font>
+(<font color="red"><i>key</i></font>).  Essa estrutura deve ser
+capaz de realizar duas operações
+básicas: <font color="red"><i>inserir</i></font> (= <font color="red"><i>insert</i></font>
+= <font color="red"><i>enter</i></font>) um novo item e <font color="red"><i>buscar</i></font>
+(= <font color="red"><i>search</i></font>
+= <font color="red"><i>lookup</i></font> )
+e <font color="red"><i>retornar</i></font> um item que tenha uma dada
+chave. Tabelas de símbolos também são chamadas
+de <font color="red"><i>dicionários</i></font>
+(<a href="http://en.wikipedia.org/wiki/Associative_array">dictionary</a>)
+em analogia ao sistema bem conhecido de armazenar palavras (chaves) e
+seus significados (itens). Algumas linguagens de programação, como
+Python, possuem dicionários como um tipo nativo:
+
+</p><pre class="code">Python 3.7.4 (default, Jul  9 2019, 18:15:00)
+[Clang 10.0.0 (clang-1000.11.45.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; estoque = { 'abacaxis': 430, 'peras': 238, 'bananas': 312, 'laranjas': 562} # chave:item
+&gt;&gt;&gt; type(estoque)
+&lt;type 'dict'&gt;
+&gt;&gt;&gt; print(estoque['peras'])
+238
+&gt;&gt;&gt; for fruta in estoque:
+...     print("Temos", estoque[fruta], fruta)
+...
+('Temos', 562, 'laranjas')
+('Temos', 238, 'peras')
+('Temos', 312, 'bananas')
+('Temos', 430, 'abacaxis')
+</pre>
+A propósito, algumas linguagens também possuem pilhas e filas como tipo nativos.
+Por exemplo, vejam o que diz a página
+<a href="https://docs.python.org/3.4/tutorial/datastructures.html">
+<i>Data Structure</i></a>.<br>
+Bem, esses comentários são apenas curiosidades. Voltemos ao que interessa...
+<p></p>
+<p>
+O programa <tt>pitao</tt>
+deverá armazenar informações sobre as variáveis em uma tabela de símbolos.
+Se invocarmos <tt>pitao</tt> com a opção "<font color="green"><tt>-t</tt></font>",
+o valor de cada variável é mostrado após a interpretação de cada expressão. 
+</p>
+<pre class="code">prompt&gt; <font color="red">./pitao <font color="green">-t</font></font>
+MAC0121 2019 - EP4
+Pitao (Oct 25 2019, 12:09:28)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">(2 + 6) * 8 **_ 1</font>
+1
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  tabela vazia.
+
+&gt;&gt;&gt; <font color="red">soma = 0</font>
+0
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  'soma': 0
+
+&gt;&gt;&gt; <font color="red">prova1 = 7</font>
+7
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  'prova1': 7 
+  'soma': 0 
+
+&gt;&gt;&gt; <font color="red">prova2 = 6.5</font>
+6.5
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  'prova2': 6.5 
+  'prova1': 7 
+  'soma': 0 
+
+&gt;&gt;&gt; <font color="red">prova3 = 4.5</font>
+4.5
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  'prova3': 4.5
+  'prova2': 6.5
+  'prova1': 7
+  'soma': 0
+
+&gt;&gt;&gt; <font color="red">soma = prova1 + prova2 + prova3</font>
+18
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  'prova3': 4.5
+  'prova2': 6.5
+  'prova1': 7
+  'soma': 18
+
+&gt;&gt;&gt; <font color="red">mediaProva = soma/3</font>
+6
+
+==========================
+  Tabela de simbolos
+  'nome': valor
+. . . . . . . . . . . . . . .
+  'mediaProva': 6
+  'prova3': 4.5
+  'prova2': 6.5
+  'prova1': 7
+  'soma': 18
+</pre>
+
+<p>&nbsp;</p>
+<hr>
+<h2>
+Visão geral do programa
+</h2>
+
+<p>
+Novos arquivos <tt>categorias.h, lexer.h, lexer.c...</tt> deverão
+ser copiados do <a href="https://www.ime.usp.br/~cris/mac121/eps/ep4/esqueleto">esqueleto</a>. Trechos de código que
+você escreveu para o EP3 deverão ser copiados para os arquivos do novo esqueleto.
+Alguns desses trechos de códigos deverão ser adaptados.
+</p>
+<p></p>    
+O programa <tt>pitao</tt>  lê linhas com expressões 
+de um arquivo dado ou interativamente a partir de um shell.
+Cada linha desse arquivo possui uma expressão infixa 
+<b><font color="red">supostamente correta</font></b>. 
+A função <tt>main()</tt> do módulo <tt>main.c</tt> mostra um passo a passo no processo
+da interpretação de cada expressão.  
+As linhas são percorridas e para cada linha <tt>pitao</tt>:
+<ol>
+  <li> imprime a linha e a expressão na linha (como no EP3);
+  </li>
+  
+  <li> cria uma fila dos itens léxicos  presentes na expressão:
+  <tt>crieFilaItens()</tt> do mólulo <tt>lexer.c</tt> 
+  faz esse serviço (como no EP3).
+  </li>
+  
+  <li> percorre a fila de itens substituindo no campo valor:
+  <ul>
+    <li> ponteiros para strings representando floats (categoria = <tt>FLOAT_SRT</tt>)
+    por doubles (categoria = <tt>FLOAT</tt>); e
+    </li>
+
+    <li> ponteiros para posições em uma tabela de operadores (categoria =
+    <tt>OPER_*</tt>) pela precedência do operador.
+    </li>
+
+  </ul> Como no EP3, a função <tt>itensParaValores()</tt> do módulo
+  <tt>eval.c</tt> é a responsável por essas substituições.
+  </li>
+  
+  <li> percorre a nova fila resultante depois da substituição e produz uma
+  nova fila que representa a expressão correspondente em notação posfixa:  
+  a função <tt>infixaParaPosfixa()</tt> do <b><font color="red">novo módulo</font></b> 
+  <tt>posfixa.c</tt> faz essa tarefa.
+  </li>
+
+  <li> percorre a fila que representa uma expressão em notação posfixa contendo
+      variáveis, números e operadores e interpreta a expressão:
+      <tt>eval()</tt> do  módulo <tt>eval.c</tt> do EP3 deverá ser adaptada para
+      tratar o operador atribuição e variáveis; 
+  </li>
+
+  <li> imprime o valor da expressão.
+</li></ol>
+Além disso, ou no meio disso, <tt>pitao</tt> deverá administrar a tabela de símbolos.
+Isto deverá ser feito na função <tt>main()</tt> do módulo <tt>main.c</tt>
+(veja os comentário nas funções) e na função <tt>eval()</tt> do módulo <tt>eval.c</tt>. 
+
+<!------------------------------------------------------------------------------>
+<p>&nbsp;</p>
+<hr>
+<h2>
+Protótipos das funções fornecidas e parcialmente fornecidas
+</h2>
+
+<p>
+Aqui estão listados os protótipos das funções fornecidas ou parcialmente fornecidas e
+que você utilizará em algum dos trechos de código que deverá escrever.
+O comportamento das funções está descrito nos comentários que precedem
+as funções nos arquivos do <a href="https://www.ime.usp.br/~cris/mac121/eps/ep4/esqueleto/">esqueleto</a>.
+</p>
+
+
+<p>
+No módulo <tt>lexer.c</tt> temos a função
+</p><pre class="code"><font color="red">Copiado de lexer.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">crieFilaItens</span> (<span style="color: #00BB00; font-weight: bold">char</span> linha[]);
+</pre></div>
+</pre>
+que <font color="red"><b>já foi adaptada</b></font> para funcionar no EP4.
+<p></p>
+
+<p>
+No módulo <tt>util.c</tt> temos as funções
+</p><pre class="code"><font color="red">Copiado de util.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #00BB00; font-weight: bold">void</span> <span style="color: #666666">*</span>
+<span style="color: #00A000">mallocSafe</span> (<span style="color: #00BB00; font-weight: bold">size_t</span> nbytes);
+
+String 
+<span style="color: #00A000">getLine</span> (<span style="color: #00BB00; font-weight: bold">FILE</span> <span style="color: #666666">*</span>infile);
+</pre></div>
+</pre>
+que estão  <font color="red"><b>completamente escritas</b></font>.
+<p></p>
+
+<p>
+No módulo <tt>main.c</tt> temos as funções
+</p><pre class="code"><font color="red">Copiado de main.c:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #AA22FF; font-weight: bold">static</span> <span style="color: #00BB00; font-weight: bold">void</span> 
+<span style="color: #00A000">mostreUso</span> (<span style="color: #00BB00; font-weight: bold">char</span> <span style="color: #666666">*</span>nomePrograma);
+
+<span style="color: #00BB00; font-weight: bold">int</span> 
+main(<span style="color: #00BB00; font-weight: bold">int</span> argc, <span style="color: #00BB00; font-weight: bold">char</span> <span style="color: #666666">*</span>argv[]);
+</pre></div>
+</pre>
+que <font color="red"><b>deverão ser adaptadas</b></font>
+para este EP4.
+<p></p>
+
+
+<!------------------------------------------------------------------------------>
+<p>&nbsp;</p>
+<hr>
+<h2>
+Protótipos das funções que você deve implementar.
+</h2>
+<p>&nbsp;</p>
+
+<p> Aqui estão listados os protótipos das funções que você deverá
+escrever.  Algumas funções você já fez para o EP3 e deverão ser
+simplesmente <b><font color="green">copiadas</font></b> para o EP4.
+Outras funções que você fez para o EP3 deverão ser <font color="blue"><b>adaptadas</b></font> para o novo <tt>pitao</tt>.  
+Já outras funções são totalmente novas e deverão ser <font color="red"><b>completamente escritas</b></font> para o EP4.  O
+comportamento das funções está descrito nos comentários que precedem as
+funções nos arquivos do <a href="https://www.ime.usp.br/~cris/mac121/eps/ep4/esqueleto">esqueleto</a> ou ainda no
+meio da função, como no caso das funções <tt>main()</tt> e
+<tt>mostreUso()</tt> do módulo <tt>main.c</tt>.<br> Você (sempre!) pode
+escrever mais funções auxiliares.  </p>
+
+<p>
+Em um <font color="red"><b>novo módulo</b></font>,
+o  <tt>posfixa.c</tt> temos a função
+</p><pre class="code"><font color="red">Copiado de posfixa.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">infixaParaPosfixa</span> (CelObjeto <span style="color: #666666">*</span>iniInfixa);
+</pre></div>
+</pre>
+que recebe uma expressão em notação infixa representada  
+através de uma fila <tt>iniInfixa</tt> e
+retorna a expressão correspondente em notação posfixa.
+A expressão retornada também deve ser representada através de uma fila.
+Ambas as filas deverão ser implementadas através <font color="red"><b>listas encadeadas com cabeça</b></font>.
+<p></p>
+
+<p>
+Em um <font color="red"><b>outro novo módulo</b></font>,
+o  <tt>st.c</tt>, deverão ser implementadas todas as funções que manipulam
+a tabela de símbolos. A interface para a tabela de símbolos é composta
+pelas funções
+</p><pre class="code"><font color="red">Copiado de st.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">initST</span>();
+
+CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">getValorST</span>(<span style="color: #00BB00; font-weight: bold">char</span> <span style="color: #666666">*</span>nomeVar);
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">setValorST</span>(<span style="color: #00BB00; font-weight: bold">char</span> <span style="color: #666666">*</span>nomeVar, CelObjeto <span style="color: #666666">*</span>pValor);
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">showST</span>(); 
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">freeST</span>();
+</pre></div>
+</pre>
+Além dessas funções, o módulo <tt>st.c</tt> contém a função auxiliar
+<pre class="code"><font color="red">Copiado de st.c:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #AA22FF; font-weight: bold">static</span> CelST <span style="color: #666666">*</span><span style="color: #AA22FF; font-weight: bold">static</span> CelST <span style="color: #666666">*</span>
+<span style="color: #00A000">endVarST</span>(<span style="color: #00BB00; font-weight: bold">char</span> <span style="color: #666666">*</span>nomeVar);
+</pre></div>
+</pre>
+que também deverá ser implementada. A tabela de símbolos deverá ser implementada através de uma <font color="red"><b>lista encadeada com cabeça</b></font>
+(vixe, mais uma. . .) em que cada célula é do tipo <font color="green"><tt>CelST</tt></font>. O tipo <font color="green"><tt>CelST</tt></font> é declarado em <tt>st.h</tt>
+<p></p>
+
+<p>
+No módulo <tt>objetos.c</tt>
+</p><pre class="code"><font color="red">Copiado de objetos.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">freeObjeto</span>(CelObjeto <span style="color: #666666">*</span>pObj);
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">freeListaObjetos</span>(CelObjeto <span style="color: #666666">*</span>iniLista);
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">mostreValor</span>(CelObjeto <span style="color: #666666">*</span>pValor);
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">mostreObjeto</span>(CelObjeto <span style="color: #666666">*</span>pObj, <span style="color: #00BB00; font-weight: bold">int</span> tipoLista);
+
+<span style="color: #00BB00; font-weight: bold">void</span>  
+<span style="color: #00A000">mostreListaObjetos</span>(CelObjeto <span style="color: #666666">*</span>iniLista, <span style="color: #00BB00; font-weight: bold">int</span> tipoLista);
+</pre></div>
+</pre>
+As funções <tt>mostreObjeto()</tt> e <tt>mostreListaObjetos()</tt> <font color="red"><b>deverão ser adaptada</b></font> para
+imprimir a expressão posfixa.
+A função <tt>freeObjeto()</tt> <font color="red"><b>deverá ser adaptada</b></font> para dar free em uma <tt>CelObjeto</tt> que representa uma variável
+(categoria <tt>ID</tt>).
+Já as funções <tt>mostreValor()</tt>,  <tt>freeObjeto()</tt> e <tt>freeListaObjetos()</tt> são as mesmas que foram
+escritas para o EP3.
+<p></p>
+
+<p>
+No módulo <tt>eval.c</tt>
+</p><pre class="code"><font color="red">Copiado de eval.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #00BB00; font-weight: bold">void</span> 
+<span style="color: #00A000">itensParaValores</span> (CelObjeto <span style="color: #666666">*</span>iniFila);
+
+CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">eval</span>(CelObjeto <span style="color: #666666">*</span>iniPosfixa, Bool mostrePilhaExecucao);
+</pre></div>
+</pre>
+a função <tt>itensParaValores()</tt> <font color="red"><b>talvez tenha que ser adaptada</b></font> para tratar o operador de atribuição <font color="red"><tt>=</tt></font>. Nada precisa ser feito a respeito de abre e fecha parênteses.
+No entanto, a função <tt>eval()</tt> <font color="red"><b>deverá ser adaptada</b></font>
+para tratar o operador de atribuição e variáveis. O tratamento das variáveis será feito através das funções que estão na interface para a tabela de símbolos.
+<p></p>
+
+
+<!--------------------------------------------------------------------->
+<p>&nbsp;</p>
+<hr>
+<h2>
+Tabela de símbolos, infixa para posfixa e interpretação de expressões
+</h2>
+
+<p>
+Estão descritos aqui alguns aspectos sobre as implementação.
+Talvez esta descrição seja meio que redundante se levamos em consideração o que já foi descrito e as especificações nos arquivos do esqueleto.
+
+
+
+</p><h3>
+Tabela de símbolos 
+</h3>
+
+<p>
+O programa utilizará uma tabela de símbolos para armazenar informações sobre
+as variáveis.
+Essa tabela será representada através de uma lista ligada com cabeça em
+que toda célula é do tipo <tt>CelST</tt>
+</p><pre class="code"><font color="red">Copiado de st.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-style: italic">/*----------------------------------------------------------*/</span>
+<span style="color: #008800; font-style: italic">/* estrutura basica da tabela de simbolos */</span>
+
+<span style="color: #AA22FF; font-weight: bold">typedef</span> <span style="color: #AA22FF; font-weight: bold">struct</span> celST CelST;
+<span style="color: #AA22FF; font-weight: bold">struct</span> celST 
+{
+    <span style="color: #008800; font-style: italic">/* ponteiro para o nome da variavel */</span>
+    String nomeVar; 
+
+    <span style="color: #008800; font-style: italic">/* tipo da variavel (neste EP e' sempre FLOAT) */</span>
+    Categoria tipoVar;
+
+    <span style="color: #008800; font-style: italic">/* valor da variavel (neste EP e' sempre um double) */</span>
+    Valor valorVar;
+
+    <span style="color: #008800; font-style: italic">/* proxima celula da tabela de simbolos */</span>
+    CelST <span style="color: #666666">*</span>proxVar; 
+};
+</pre></div>
+</pre>
+O campo <tt>nomeVar</tt> é um ponteiro para o string com o nome da variável.
+O campo <tt>tipoVar</tt> indica o tipo da variável, que nesse EP é sempre <tt>FLOAT</tt>.
+Neste EP, como as variaveis são do tipo <tt>FLOAT</tt>, um <tt>double</tt>, que representa  o valor da variável, é
+armazenado no campo <tt>valorVar</tt>.
+<p></p>
+
+
+<h3>
+Infixa para posfixa
+</h3>
+
+<p>
+Cada linha do arquivo de entrada contém uma expressão infixa
+<font color="blue"><b>correta</b></font> formada por números, <font color="red">variáveis</font> e por operadores.
+Após a leitura de cada linha contendo uma expressão infixa, 
+o programa <tt>pitao</tt> produz uma fila com os itens léxicos que formam a expressão
+na linha. Isto é feito pela função <tt>crieFilaItens()</tt> do módulo <tt>lexer.c</tt>.
+Em seguida, essa fila é tratada pela função <tt>itensParaValores()</tt> do módulo <tt>eval.c</tt>.
+Em seguida essa fila será convertida em uma fila que representa a expressão correspondente em notação posfixa. Essa conversão deve ser feita pela função
+</p><pre class="code"><font color="red">Copiado de posfixa.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">infixaParaPosfixa</span> (CelObjeto <span style="color: #666666">*</span>iniInfixa);
+</pre></div>
+</pre>
+do módulo  <tt>posfixa.c</tt>. Essa função recebe a fila contendo a expressão infixa e retorna
+a fila com a expressão correspondente na notação posfixa.
+Esta função é uma adaptação da função de mesmo nome <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/pilha.html">dessa página</a>.
+<p></p>
+
+<p>
+Ao longo de todo processo as filas são implementadas através de uma <font color="red"><b>lista encadeadas com cabeça</b></font>
+em que toda célula é do tipo <tt>CelObjeto</tt>, como as filas do EP3.
+Na fila com a expressão posfixa, cada célula armazena uma 
+<font color="red">variável</font>, um número, ou um operador.
+Suponha que <tt>p</tt> é um ponteiro para uma célula dessa fila. 
+</p><ol>
+  <li> <font color="red">se a célula  armazena uma variável</font>, então 
+    <tt>p-&gt;categoria == ID</tt> (<tt>ID</tt> é uma constante definida em <tt>categorias.h</tt>) e
+       <tt>p-&gt;valor.pStr</tt> é o ponteiro para o string com o 
+       nome da variável;
+  
+  </li><li> se a célula armazena um número,
+  então <tt>p-&gt;categoria == FLOAT</tt> (<tt>FLOAT</tt>
+ é uma constante definida em <tt>categorias.h</tt>) e
+  <tt>p-&gt;valor.vFloat</tt> contém o número;
+
+  </li><li> se a célula armazena um operador, então <tt>p-&gt;categoria ==
+       OPER_*</tt> (aqui, * significa um dos possíveis complementos na
+       tabela <tt>enum categoria</tt> definida em <tt>categoria.h</tt>) e
+       <tt>p-&gt;valor.vInt</tt> é um inteiro que indica a precedência
+       desse operador como definida na tabela <tt>static const int
+       precedencia[]</tt> definida no módulo <tt>eval.c</tt>.
+</li></ol> <p></p>
+<p>
+Macros podem tornar mais conveniente e claro o acesso através de ponteiros
+aos campos de uma estrutura como <tt>CelObjeto</tt>. Para isso foram
+declaradas as macros a seguir.
+</p><pre class="code"><font color="red">Copiado de objetos.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-style: italic">/* nome de variaveis */</span>
+<span style="color: #008800; font-style: italic">/* torna possivel escrevermos p-&gt;nomeID em vez de p-&gt;valor.pStr */</span>
+<span style="color: #008080">#define nomeID  valor.pStr</span>
+
+<span style="color: #008800; font-style: italic">/* precedencia de operadores */</span> 
+<span style="color: #008800; font-style: italic">/* torna possivel escrevermos p-&gt;prec em vez de p-&gt;valor.pInt */</span>
+<span style="color: #008080">#define prec    valor.pInt</span>
+
+<span style="color: #008800; font-style: italic">/* valores */</span>
+<span style="color: #008800; font-style: italic">/* torna possivel escrevermos p-&gt;val em vez de p-&gt;valor.vFloat */</span>
+<span style="color: #008080">#define val     valor.pFloat</span>
+</pre></div>
+</pre>
+
+
+
+<h3>
+Interpretação da expressão posfixa
+</h3>
+
+<p>
+Para interpretar a expressão posfixa a partir da fila,
+o seu programa deve utilizar uma pilha.
+A pilha deve ser implementada por meio de uma 
+<font color="red"><b>lista encadeada com cabeça</b></font> 
+em que cada elemento é do tipo <tt>CelObjeto</tt>.
+Como no
+<a href="http://www.ime.usp.br/~coelho/mac0122-2013/ep3/">EP3</a>,
+essa tarefa será feita pela função
+</p><pre class="code"><font color="red">Copiado de eval.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">eval</span>(CelObjeto <span style="color: #666666">*</span>iniPosfixa, Bool mostrePilhaExecucao);
+</div></pre>
+
+que <font color="red"><b>deverá ser adaptada</b></font> para o EP4.
+<p></p>
+<p>
+Na descrição a seguir, por <font color="red"><b>valor de uma célula</b></font> <tt>pCel</tt>
+entenda-se:
+</p><ul>
+<li> se a célula contém um número (<tt>pCel-&gt;categoria == FLOAT</tt>), o seu valor está no campo <tt>pCel-&gt;val</tt>.
+  </li>
+  <li>se a célula contém uma variável (<tt>pCel-&gt;categoria == ID</tt>), o seu valor deve
+  ser obtido da tabela de símbolos através da função <tt>getValorST(pCel-&gt;nomeID)</tt> do módulo <tt>st.c</tt>
+  que retorna um ponteiro para uma <tt>CelObjeto</tt> com um <tt>FLOAT</tt>. 
+  </li></ul>
+<!--
+  <ul>
+<li>o valor contido no campo <tt>cel.numero</tt> de uma c&eacute;lula com
+<tt>cel.simbolo</tt> igual a NUMERO.
+  </li>
+  <li>o valor contido no campo <tt>valor</tt> da tabela de variáveis
+  da posição correspondente &agrave; variável
+  <tt>cel.simbolo</tt>. Assim, o valor de uma variável deve ser obtido
+  da tabela de variáveis.
+  </ul>
+-->
+<p></p>
+
+<p>
+O seu programa deve examinar cada célula da fila com a expressão posfixa e:
+</p><ul>
+<li> <font color="red">Se a célula examinada contém uma variável</font>,
+      o programa deve empilhá-la.
+</li><li> Se a célula examinada contém um número, o programa deve empilhá-lo.
+</li><li> Se a célula examinada contém um operador, o programa deve:
+  <ul>
+    <li>desempilhar uma ou duas células da pilha, dependendo se o 
+        operador é unário ou binário.
+    </li><li>calcular o valor da operação correspondente utilizando os
+    <b>valores</b> das células desempilhadas.
+    </li><li>empilhar uma célula com o valor calculado. O campo
+    <tt>vFloat</tt> da célula empilhada deve conter o número e o campo <tt>categoria</tt>
+     deve conter <tt>FLOAT</tt>.
+  </li></ul>
+</li><li> Se a célula examinada contém o operador <font color="red"><tt>'='</tt></font>,
+     o programa deve (agora vem ...):
+  <ul>
+    <li> desempilhar duas células da pilha: <tt>pCel1</tt> e
+    depois <tt>pCel2</tt>.
+    </li><li> utilizar o valor de <tt>pCel1</tt> para atualizar o 
+    <tt>valor</tt> da variável <tt>pCel2-&gt;nomeID</tt> na
+    tabela de símbolos.
+    Isto deverá ser feito através da função <tt>setValorST()</tt> do módulo <tt>st.c</tt>.
+    
+    </li><li>empilhar uma célula com o valor da atribuição e campo
+    <tt>vFloat</tt> contendo esse valor e com o campo <tt>categoria</tt> contendo <tt>FLOAT</tt>.
+  </li></ul>
+</li></ul>
+Procedendo da forma acima, ao final, o valor da expressão se encontra no 
+topo da pilha. É o endereço dessa célula no topo que deverá ser retornado pela função <tt>eval()</tt>.
+
+<p>Para saber mais detalhes de como o programa realiza o cálculo da
+expressão em notação posfixa, consulte as notas de aula.
+
+<!--
+<p>
+  Escreva uma função com o seguinte protótipo
+  <pre class="code">
+    float calculaPosfixa(Celula *cab, Tabela variavel[26]);
+  </pre>
+   que recebe uma fila circular com cabeça <tt>cab</tt> de números e operadores    representando um expressão posfixa e <font color="red">o vetor <tt>variavel</tt> que armazena a tabela de variáveis</font>. 
+   Utilizando a tabela de variáveis a função calcula e 
+   devolve o valor da expressão além de eventualmente alterar ou 
+   inicializar os valores de variáveis na tabela.   
+-->
+
+
+
+<!-------------------------------------------------------------------->
+</p><p>&nbsp;</p>
+<hr>
+<h2 id="precedence">Precedência entre operadores</h2>
+
+<p>A tabela abaixo é baseada na tabela de precedência
+disponível
+<a href="http://www.ime.usp.br/~pf/algoritmos/apend/precedence.html">aqui</a>.
+
+Nessa tabela, os operadores estão em ordem 
+decrescente de prioridade:
+na primeira linha os operadores executados em primeiro lugar e
+na última os operadores executados por último.&nbsp;
+Assim, o operador '=' possui a menor precedência dentre os operadores da tabela.
+A coluna direta indica a convenção de associação
+para os operadores da linha.
+</p><center>
+<table class="BB" align="center" cellspacing="2" cellpadding="4">
+
+<tbody><tr id="unary">
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>(&nbsp;)</tt>
+</td><td>esquerda-para-esquerda
+
+</td></tr><tr id="unary">
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>_&nbsp;  not&nbsp; ^</tt>
+</td><td>direita-para-esquerda
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>*&nbsp; /&nbsp; %&nbsp; //</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>+&nbsp; -</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>&lt;&nbsp; &lt;=&nbsp; &gt;=&nbsp; &gt;</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>==&nbsp; !=</tt>
+</td><td>esquerda-para-direita
+
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>and</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>or</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>=&nbsp;</tt>
+</td><td>direita-para-esquerda
+
+</td></tr></tbody></table>
+</center>
+
+<p>
+A tabela abaixo exemplifica a precedência dos operadores. Note, por exemplo, a
+associatividade da esquerda para direita entre operadores
+como <tt>'+'</tt> e <tt>'-'</tt> ou <tt>'*'</tt> e <tt>'/'</tt> e a
+associatividade da direita para esquerda dos
+operadores  <tt>'_'</tt>, <tt>'not'</tt>, <tt>'**'</tt> e <tt>'='</tt>.
+</p><center>
+<p><table align="center" cellpadding="6">
+
+<tbody><tr>
+<td bgcolor="silver">expressão
+</td><td bgcolor="silver">interpretação
+
+
+</td></tr><tr>
+<td><tt>2 + 3 + 4</tt>
+</td><td><tt>(2 + 3) + 4</tt>
+
+
+</td></tr><tr>
+<td><tt>2 ** 3 ** 4</tt>
+</td><td><tt>2 ** (3 ** 4)</tt>
+
+
+</td></tr><tr>
+<td><tt>A * B / C</tt>
+</td><td><tt>(A * B) / C</tt>
+
+</td></tr><tr>
+<td><tt>A = B + C / 3.2 / C &nbsp;&nbsp;&nbsp;      </tt>
+</td><td><tt>A = (B + ((C / 3.2) / C)) </tt>
+
+</td></tr><tr>
+<td><tt>A = B = C = 3.2 </tt>
+</td><td><tt>A = (B = (C = 3.2)) </tt>
+
+</td></tr><tr>
+<td><tt>A * _ B ** C - 2 </tt>
+</td><td><tt>((A * (_ (B ** C)) - 2) </tt>
+
+</td></tr></tbody></table>
+</p></center>
+
+<!----------------------------------------------------------------------------->
+<p>&nbsp;</p>
+<hr>
+<h2>
+Descrição dos arquivos do EP
+</h2>
+
+<p>
+Aqui temos uma visão geral dos arquivos que compõem o EP.<br>
+<font color="red"><b>Você deverá entregar apenas um arquivo
+<tt>zip</tt> ou <tt>tar.gz</tt>
+contendo todos os arquivos no diretório do seu EP4.</b></font> 
+</p>
+
+<p>
+Este exercício programa é formado por 16 arquivos 8-[.<br>
+O diretório com esqueleto do EP contém, além desses 16 arquivos, 
+um Makefile para gerar o executável do <tt>pitao</tt> do EP.
+Os arquivos no diretório com o esqueleto são
+</p><pre class="saida">prompt/esqueleto&gt; ls -l
+total 272
+-rw-r--r--@ 1 cris  26744 Oct 25 11:27 00-esqueleto.zip
+-rw-r--r--@ 1 cris    945 Oct 24 12:15 Makefile
+-rw-r--r--@ 1 cris   3132 Oct 25 11:18 categorias.h
+-rw-r--r--@ 1 cris   7971 Oct 24 12:15 eval.c
+-rw-r--r--@ 1 cris    661 Oct 25 11:18 eval.h
+-rw-r--r--@ 1 cris  16497 Oct 25 11:19 lexer.c
+-rw-r--r--@ 1 cris    661 Oct 25 11:19 lexer.h
+-rw-r--r--@ 1 cris   8591 Oct 25 11:19 main.c
+-rw-r--r--@ 1 cris  10806 Oct 24 12:15 objetos.c
+-rw-r--r--@ 1 cris   3697 Oct 25 11:19 objetos.h
+<font color="red">-rw-r--r--@ 1 cris   2469 Oct 24 12:15 posfixa.c</font>
+<font color="red">-rw-r--r--@ 1 cris    384 Oct 24 12:15 posfixa.h</font>
+<font color="red">-rw-r--r--@ 1 cris   5846 Oct 24 12:15 st.c</font>
+<font color="red">-rw-r--r--@ 1 cris   1107 Oct 24 12:15 st.h</font>
+-rw-r--r--@ 1 cris   1594 Oct 24 12:15 stack.c
+-rw-r--r--@ 1 cris   1494 Oct 25 11:20 stack.h
+-rw-r--r--@ 1 cris   2833 Oct 25 11:20 util.c
+-rw-r--r--@ 1 cris   1257 Oct 25 11:20 util.h
+</pre>
+<p></p>
+<p>
+O arquivo <tt>00-esqueleto.zip</tt> contém todos os arquivos <tt>.h</tt>, <tt>.c</tt>
+que formam o EP4 junto com o Makefile.
+</p>
+
+<p>
+Os arquivos que deverão ser manipulados são <tt>main.c</tt>, <tt>objetos.c</tt>,
+<tt>eval.c</tt>, <tt>posfixa.c</tt> e <tt>st.c</tt>. 
+Os demais arquivos <font color="red"><b>não devem ser alterados</b></font>.
+</p>
+<p>
+Os arquivos no <a href="https://www.ime.usp.br/~cris/mac121/eps/ep4/esqueleto/">esqueleto</a> contêm comentários
+nos protótipos das funções que deverão ser feitas, parcialmente feitas ou
+estão completas. Os comentários fornecem as especificação do comportamento de cada função.
+</p>
+<p>
+Para compilar o programa e gerar o executável basta,
+na linha de comando, digitar <tt>make</tt>.
+Faça isto assim que baixar o esqueleto e você verá as seguintes mensagens e
+um executável de nome <tt>pitao</tt> será gerado.  
+</p><pre class="saida">prompt/esqueleto&gt; <font color="red">make</font>
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c util.c
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c objetos.c
+<font color="red">objetos.c:57:14: warning: unused variable 'nomeCategoria' [-Wunused-variable]
+static char *nomeCategoria[MAX_CATEGORIAS] =
+             ^
+1 warning generated.</font>
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c lexer.c
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c stack.c
+<font color="red">stack.c:51:1: warning: ISO C requires a translation unit to contain at least one declaration [-Wempty-translation-unit]
+^
+1 warning generated.</font>
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c posfixa.c
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c st.c
+<font color="red">st.c:49:15: warning: unused variable 'ini' [-Wunused-variable]
+static CelST *ini;
+              ^
+st.c:194:1: warning: unused function 'endVarST' [-Wunused-function]
+endVarST(char *nomeVar)
+^
+2 warnings generated.</font>
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c eval.c
+<font color="red">eval.c:62:18: warning: unused variable 'precedencia' [-Wunused-const-variable]
+static const int precedencia[MAX_OPERADORES] =
+                 ^
+1 warning generated.</font>
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c main.c
+gcc  util.o objetos.o lexer.o stack.o posfixa.o st.o eval.o main.o -o pitao -lm
+</pre>
+Note que, apesar de no esqueleto o corpo das funções que deverão ser feitas estar vazio, 
+o EP compila <font color="red">sem erros de sintaxe e com 5 avisos</font>.
+Se você executar o programa imediatamente verá que ele não faz grandes coisas:
+<pre class="code">prompt/esqueleto&gt; <font color="red">pitao</font>
+MAC0121 2019 - EP4
+Pitao (Oct 25 2019, 12:09:28)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; 1 + 2
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao itensParaValores.
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao eval.
+AVISO: objetos.c: Vixe! Ainda nao fiz a funcao freeListaObjetos.
+&gt;&gt;&gt; a = 2
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao itensParaValores.
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao eval.
+AVISO: objetos.c: Vixe! Ainda nao fiz a funcao freeListaObjetos.
+&gt;&gt;&gt; a
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao itensParaValores.
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao eval.
+AVISO: objetos.c: Vixe! Ainda nao fiz a funcao freeListaObjetos.
+&gt;&gt;&gt;
+</pre>
+<p></p>
+<p>
+Agora passamos à descrição dos arquivos.<br>
+</p><ul>
+  
+  <!------------------------------------------------------------------------------>
+  <li><font color="magenta"><tt>categorias.h</tt></font><br>
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  Contém declarações de constantes que indicam as categorias dos itens léxicos e
+  a declaração do tipo <font color="magenta"><tt>Categoria</tt></font>.
+  Essas contantes e tipos são usados em todos os módulos. 
+  <pre class="code"><font color="red">Copiado de categorias.h:</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-style: italic">/* </span>
+<span style="color: #008800; font-style: italic"> * numero de operadores</span>
+<span style="color: #008800; font-style: italic"> * aritmeticos + relacionais + logicos + indexacao + atribuicao </span>
+<span style="color: #008800; font-style: italic"> *    8        +      6      +    3    +     1     +     1</span>
+<span style="color: #008800; font-style: italic"> */</span>               
+<span style="color: #008800">#define MAX_OPERADORES 19</span>
+
+<span style="color: #008800; font-style: italic">/*-------------------------------------------------------------*/</span>
+<span style="color: #008800; font-style: italic">/* temos 32 categorias de itens lexicos                        */</span>
+<span style="color: #008800">#define MAX_CATEGORIAS  32</span>
+
+<span style="color: #AA22FF; font-weight: bold">enum</span> listaCategorias
+{
+    [. . .  trecho removido . . .]
+};
+<span style="color: #AA22FF; font-weight: bold">typedef</span> <span style="color: #AA22FF; font-weight: bold">enum</span> listaCategorias Categoria; 
+</pre></div></pre>
+  </li>
+
+ <!------------------------------------------------------------------------------>
+<li><font color="red"><tt>posfixa.h</tt></font><br>
+
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  É a interface do módulo <tt>posfixa.c</tt> e contém
+   a declaração da função <tt>infixaParaPosfixa()</tt>.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="red"><tt>posfixa.c</tt></font><br>
+  Contém a implementação correspondente à interface <tt>posfixa.h</tt>.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>st.h</tt></font><br>
+Nada deve ser feito ou alterado neste arquivo.<br>
+Contém a declaração da estrutura <font color="green"><tt>CelST</tt></font> que é o tipo da 
+célula usada pela tabela de símbolos. 
+Além disso, este arquivo é a interface para o módulo <tt>st.c</tt> 
+e contém as declarações das funções que manipulam a tabela de símbolos.
+</li>
+  
+  
+  <!------------------------------------------------------------------------------>
+<li><font color="green"><tt>st.c</tt></font><br>
+  Contém as implementações correspondente à interface <tt>st.h</tt>, ou seja,
+contém as definições das funções que manipulam a tabela de símbolos:
+<tt>initST(), getValorST(), setValorST(), showST(), freeST()</tt> e <tt>endVarST()</tt>.
+</li>
+
+  <!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>util.h</tt></font><br>
+
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  Este arquivo é a interface para tipos (<tt>String, Bool</tt>) e contém funções
+  (<tt>mallocSafe(), getLine()</tt>) de uso geral.
+
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>util.c</tt></font><br>
+  Contém as implementações correspondentes à interface <tt>util.h</tt>.<br>
+</li>
+
+  <!------------------------------------------------------------------------------>
+<li><font color="magenta"><tt>objetos.h</tt></font><br>
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  Aqui estão a declaração do tipo <font color="green"><tt>CelObjeto</tt></font> que
+  é <font color="red"><b>fundamental</b></font> para este EP.<br>
+  Aqui também estão os protótipos de algumas das funções mais básicas para
+  imprimir e liberar a área alocada por objetos do tipo <font color="green"><tt>CelObjeto</tt></font>
+  e listas de células do tipo <font color="green"><tt>CelObjeto</tt></font>.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="magenta"><tt>objetos.c</tt></font><br>
+  Contém as implementações correspondentes à interface <tt>objetos.h</tt>.<br>
+  Você deve <font color="red"><b>copiar</b></font> o corpo das funções que
+  você fez no EP3 para este arquivo e <font color="red"><b>adaptar</b></font>
+  algumas funções, como descrito nos comentários que precedem as funções.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="red"><tt>lexer.h</tt></font><br>
+
+Nada deve ser feito ou alterado neste arquivo.<br>
+É a interface para a análise léxica feita pela função <tt>crieFilaItens()</tt>. 
+A declaração da macro/abreviatura do campo <tt>item</tt> (<tt>valor.pStr</tt>) 
+para células que contêm itens léxicos está neste arquivo.
+</li>
+  
+  
+<!------------------------------------------------------------------------------>
+<li><font color="red"><tt>lexer.c</tt></font><br>
+Nada deve ser feito ou alterado neste arquivo. <br>
+Contém as implementações correspondentes à interface <tt>lexer.h</tt>.<br>
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>eval.h</tt></font><br>
+
+Nada deve ser feito ou alterado neste arquivo. <br>
+Interface para a função que troca um item léxico pelo seu 
+"valor" em uma fila de células do tipo <tt>CelObjeto</tt>
+e da função que calcula o valor de uma expressão em notação posfixa.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>eval.c</tt></font><br>
+
+Implementações correspondentes à interface <tt>eval.h</tt>.
+Aqui estão as definições das funções:
+<ul>
+  <li> <tt>itensParaValores()</tt> responsável pela  substituição de strings que representam itens léxicos pelos seus respectivos valores; e
+  </li><li> <tt>eval()</tt> responsável pelo cálculo do valor de uma expressão em notação posfixa.
+</li></ul>
+Essas funções <font color="red"><b>deverão ser adaptadas</b></font>.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>stack.h</tt></font><br>
+
+Interface para uma pilha.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>stack.c</tt></font><br>
+
+
+Implementação correspondentes à interface <tt>stack.h</tt>.
+Aqui uma pilha deve ser implementada através de uma lista encadeada com cabeça.
+Nada de novo precisa ser feito aqui,
+<font color="red"><b>basta copiar</b></font> para esse arquivo o código
+no EP3.
+
+
+<!------------------------------------------------------------------------------>
+</li><li><font color="magenta"><tt>lexer.h</tt></font><br>
+Nada deve ser feito ou alterado neste arquivo.<br>
+Contém a declaração da função que <tt>CrieFilaItens()</tt> que é responsável pela análise léxica de cada linha.
+</li>
+  
+  
+<!------------------------------------------------------------------------------>
+<li><font color="magenta"><tt>lexer.c</tt></font><br>
+Implementação correspondentes à interface <tt>stack.h</tt>.
+Nada deve ser feito ou alterado neste arquivo. <br>
+Contém a definição da <font color="red"><b>nova versão</b></font> 
+da função <tt>CrieFilaItens()</tt> que é a
+responsável pela análise léxica.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="red"><tt>main.c</tt></font><br>
+Você deve adaptar a função <tt>main()</tt> para incorporar as novas opções "-e" e "-t",
+as chamadas de funções para criar, liberar e exibir a tabela de símbolos, além da
+chamada à função que converte uma expressão infixa para posfixa.
+A função <tt>mostreUso()</tt> também deve ser adaptada.
+
+</li>
+
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>Makefile</tt></font><br>
+<font color="black"><i>Para fazer o EP não é necessário olhar o conteúdo deste arquivo,
+mas é divertido ;-).</i></font><br>
+
+Para compilar e gerar o executável <tt>pitao</tt> do
+<tt>EP4</tt> basta digitar <font color="red"><tt>make</tt></font> no prompt.<br>
+
+<pre class="saida"> 
+prompt&gt; <font color="red">make</font>
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c util.c 
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c objetos.c 
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c lexer.c 
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c stack.c
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c posfixa.c
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c st.c 
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c eval.c 
+gcc -Wall -ansi -g -pedantic -Wno-unused-result -c main.c 
+gcc  util.o objetos.o lexer.o stack.o posfixa.o st.o eval.o main.o -o pitao -lm
+</pre>
+
+
+
+
+<!--------------------------------------------------------------------->
+<p>&nbsp;</p>
+<hr>
+<h2>
+Observações
+</h2>
+
+<ul>
+  <li>Teste seu programa com arquivos de entrada diferentes.
+
+  </li><li>O executável <a href="https://www.ime.usp.br/~cris/mac121/eps/ep4/executaveis/"><tt>pitao</tt></a>
+  resolve o problema. Compare os resultados obtidos pelo seu programa
+  com o do executável fornecido. 
+
+  </li><li>Todos os exercícios são
+    <fot color="red"><b>estritamente individuais</b>.
+
+  </fot></li><li>Exercícios atrasados não serão aceitos. 
+
+  </li><li>Exercícios com erros de sintaxe receberão nota 0. 
+
+  </li><li>Indente o seu programa sistematicamente.
+      Uma má apresentação do código  resultará em nota menor.
+      Veja <a href="http://www.gnu.org/prep/standards.html">GNU Coding
+      Standards</a> (<a href="http://www.ime.usp.br/~jose/standards.html">cópia
+      local</a>).
+</li></ul>
+
+<hr>
+ 
+</li></ul></body></html>
